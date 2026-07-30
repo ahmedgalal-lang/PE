@@ -1,0 +1,11 @@
+.mockup-root { font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial; padding: 18px; }
+.mockup-header { margin-bottom: 12px; }
+.mockup-main { display: flex; gap: 16px; }
+.left-col { flex: 1; min-width: 520px; }
+.right-col { width: 360px; display: flex; flex-direction: column; gap: 12px; }
+.inspector { border: 1px solid #eee; padding: 12px; border-radius: 6px; background: #fff; }
+.sop-editor { min-height: 100px; border: 1px solid #eee; padding: 8px; border-radius: 6px; background: #fafafa; }
+.raci-matrix { margin-top: 12px; border: 1px solid #eee; padding: 12px; border-radius: 6px; background: #fff; }
+.raci-matrix table { width: 100%; border-collapse: collapse; }
+.raci-matrix th, .raci-matrix td { border: 1px solid #f1f1f1; padding: 6px; text-align: left; }
+.ai-panel { border: 1px solid #eee; padding: 12px; border-radius: 6px; background: #fff; }
