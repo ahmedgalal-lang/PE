@@ -1,0 +1,150 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Organization {
+  id        String   @id @default(uuid())
+  slug      String   @unique
+  name      String
+  createdAt DateTime @default(now())
+  users     User[]
+  processes Process[]
+}
+
+model User {
+  id           String   @id @default(uuid())
+  orgId        String
+  email        String   @unique
+  name         String?
+  role         String
+  createdAt    DateTime @default(now())
+  organization Organization @relation(fields: [orgId], references: [id])
+
+  @@index([orgId])
+}
+
+model Process {
+  id          String   @id @default(uuid())
+  orgId       String
+  title       String
+  description String?
+  ownerId     String?
+  createdAt   DateTime @default(now())
+  steps       Step[]
+  nodes       MapNode[]
+  edges       MapEdge[]
+  sops        Sop[]
+  organization Organization @relation(fields: [orgId], references: [id])
+
+  @@index([orgId])
+}
+
+model Step {
+  id            String   @id @default(uuid())
+  processId     String
+  title         String
+  description   String?
+  orderIndex    Int      @default(0)
+  estDurationMin Int?
+  raci          RaciAssignment[]
+  risks         Risk[]
+  sops          Sop[]
+  process       Process  @relation(fields: [processId], references: [id])
+
+  @@index([processId])
+}
+
+model MapNode {
+  id        String   @id @default(uuid())
+  processId String
+  stepId    String?
+  x         Float
+  y         Float
+  width     Float?
+  height    Float?
+  data      Json?
+  process   Process  @relation(fields: [processId], references: [id])
+}
+
+model MapEdge {
+  id        String   @id @default(uuid())
+  processId String
+  sourceId  String
+  targetId  String
+  label     String?
+  data      Json?
+  process   Process  @relation(fields: [processId], references: [id])
+}
+
+model RaciAssignment {
+  id        String   @id @default(uuid())
+  stepId    String
+  subjectType String
+  subjectId String
+  role      String
+  createdAt DateTime @default(now())
+  step      Step     @relation(fields: [stepId], references: [id])
+
+  @@index([stepId])
+}
+
+model Sop {
+  id           String   @id @default(uuid())
+  processId    String?
+  stepId       String?
+  authorId     String?
+  contentHtml  String   @db.Text
+  contentMd    String?  @db.Text
+  status       String   @default("draft")
+  version      Int      @default(1)
+  createdAt    DateTime @default(now())
+  process      Process? @relation(fields: [processId], references: [id])
+  step         Step?    @relation(fields: [stepId], references: [id])
+}
+
+model Risk {
+  id         String   @id @default(uuid())
+  stepId     String
+  severity   Int
+  likelihood Int
+  score      Int
+  mitigation String?
+  ownerId    String?
+  createdAt  DateTime @default(now())
+  step       Step     @relation(fields: [stepId], references: [id])
+}
+
+model Embedding {
+  id        String   @id @default(uuid())
+  targetType String
+  targetId  String
+  vector    Float[]
+  createdAt DateTime @default(now())
+}
+
+model AiSuggestion {
+  id         String   @id @default(uuid())
+  processId  String?
+  stepId     String?
+  prompt     String   @db.Text
+  response   String   @db.Text
+  modelMeta  Json?
+  accepted   Boolean  @default(false)
+  createdAt  DateTime @default(now())
+}
+
+model AuditLog {
+  id        String   @id @default(uuid())
+  orgId     String
+  userId    String?
+  action    String
+  targetType String?
+  targetId  String?
+  payload   Json?
+  createdAt DateTime @default(now())
+}
